@@ -423,6 +423,13 @@ what was reviewed, what was fixed, and what was intentionally left.
     frequent resets) is still needed. Remove what no longer
     helps — simpler processes with fewer handoffs are faster
     and lose less context
+18. **Calibrate evaluation criteria over time** -
+    After Phase 6, compare your quality assessment to what
+    the user actually flagged. If you marked "all criteria
+    met" but the user found gaps, tighten the checklist or
+    acceptance criteria for next time. This QA tuning loop
+    — read evaluator output, find divergences from human
+    expectations, refine criteria — compounds over sessions
 
 ---
 

@@ -27,16 +27,16 @@ Phase 6: Quality         8-point checklist, post-implementation docs
 ```
 
 Phases 3-5 repeat per chunk. Small features use a shortcut that skips
-chunking and planning.
+chunking and planning (but still create a 1-chunk tracker).
 
 ## When to Use It
 
 | Scope | Approach |
 |---|---|
 | Trivial (typo, rename, version bump) | Don't use this skill -- just ask Claude directly |
-| Small (single-file logic, simple bug fix) | `/tdd` with small feature shortcut |
+| Small (single-file logic, simple bug fix) | `/tdd` with small feature shortcut (1-chunk tracker) |
 | Medium+ (multi-file, unfamiliar code) | `/tdd` full process |
-| Large (cross-cutting, multi-session) | `/tdd` full process + JSON tracker |
+| Large (cross-cutting, multi-session) | `/tdd` full process + session resets between chunks |
 
 **Rule of thumb:** If you can describe the diff in one sentence,
 skip the skill. If you need tests to verify correctness, use it.
@@ -109,7 +109,7 @@ tdd-skill/
 ├── PROJECT.md                   # Template, copy and customize
 ├── references/
 │   ├── chunk-template.md        # How to decompose features into chunks
-│   ├── tracker-schema.md        # JSON tracker for multi-session work
+│   ├── tracker-schema.md        # JSON tracker for all features
 │   └── quality-checklist.md     # 8-point quality verification checklist
 └── project-configs/             # Example PROJECT.md for common stacks
     ├── android-kotlin.md        # Android / Kotlin / Compose / Hilt
@@ -140,9 +140,9 @@ resume instructions so work can pick up where it left off. See
 
 ### JSON Tracker
 
-For multi-session features (3+ chunks), a JSON tracker file
-tracks progress. A new session reads the tracker, finds the
-next pending chunk, and continues. See
+Every feature gets a JSON tracker file — even single-chunk
+ones. The tracker is a file-based artifact that survives context
+resets, ensuring any session can pick up where work stopped. See
 [tracker-schema.md](references/tracker-schema.md).
 
 ### 8-Point Quality Checklist
@@ -153,13 +153,14 @@ See [quality-checklist.md](references/quality-checklist.md).
 
 ### Small Feature Shortcut
 
-Single-file or few-file changes skip chunking, planning, and
-tracker creation. The process collapses to: Analysis -> Pre-Test
--> Implement -> Post-Test -> Quality Verification.
+Single-file or few-file changes skip chunking and planning but
+still create a 1-chunk tracker. The process collapses to:
+Analysis -> Pre-Test -> Implement -> Post-Test -> Quality
+Verification.
 
 ### Lessons Learned
 
-The skill includes 16 lessons from real TDD sessions. Things
+The skill includes 18 lessons from real TDD sessions. Things
 like false positive tests, dead code left behind, constructor
 cascading breakage. Applied every time.
 
@@ -171,7 +172,7 @@ Add lessons to your `PROJECT.md` or append to your copy of
 `SKILL.md` in the Lessons Learned section. Keep the format:
 
 ```markdown
-17. **Your lesson title** --
+19. **Your lesson title** --
     What happened, why it matters, what to do differently
 ```
 
