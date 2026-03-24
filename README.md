@@ -3,9 +3,16 @@
 A structured, project-agnostic Test-Driven Development process for
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
+Tests give Claude a self-verification loop -- the
+[highest-leverage pattern](https://code.claude.com/docs/en/best-practices#give-claude-a-way-to-verify-its-work)
+for agentic coding. This skill wraps that insight in a repeatable
+process that follows Claude Code's
+[Explore -> Plan -> Implement -> Commit](https://code.claude.com/docs/en/best-practices#explore-first-then-plan-then-code)
+workflow.
+
 ## What It Does
 
-When you invoke this skill, Claude Code follows a repeatable 6-phase process:
+When you invoke `/tdd`, Claude follows a 6-phase process:
 
 ```
 Phase 1: Analysis        Understand the request, explore code, check standards
@@ -19,54 +26,76 @@ Phase 6: Quality         8-point checklist, post-implementation docs
 Phases 3-5 repeat per chunk. Small features use a shortcut that skips
 chunking and planning.
 
+## When to Use It
+
+| Scope | Approach |
+|---|---|
+| Trivial (typo, rename, version bump) | Don't use this skill -- just ask Claude directly |
+| Small (single-file logic, simple bug fix) | `/tdd` with small feature shortcut |
+| Medium+ (multi-file, unfamiliar code) | `/tdd` full process |
+| Large (cross-cutting, multi-session) | `/tdd` full process + JSON tracker |
+
+**Rule of thumb:** If you can describe the diff in one sentence,
+skip the skill. If you need tests to verify correctness, use it.
+
 ## Installation
 
 ### 1. Copy the skill into your project
 
 ```bash
 # From your project root
-mkdir -p .claude/skills/tdd-implementation
-cp -r /path/to/tdd-skill/SKILL.md .claude/skills/tdd-implementation/
-cp -r /path/to/tdd-skill/references/ .claude/skills/tdd-implementation/
+mkdir -p .claude/skills/tdd
+cp -r /path/to/tdd-skill/SKILL.md .claude/skills/tdd/
+cp -r /path/to/tdd-skill/references/ .claude/skills/tdd/
 ```
 
 Or clone and copy:
 
 ```bash
-git clone https://github.com/openkash/tdd-skill.git /tmp/tdd-skill
-mkdir -p .claude/skills/tdd-implementation
-cp /tmp/tdd-skill/SKILL.md .claude/skills/tdd-implementation/
-cp -r /tmp/tdd-skill/references/ .claude/skills/tdd-implementation/
+git clone https://github.com/openkash/ai-agent-tdd-skill.git /tmp/tdd-skill
+mkdir -p .claude/skills/tdd
+cp /tmp/tdd-skill/SKILL.md .claude/skills/tdd/
+cp -r /tmp/tdd-skill/references/ .claude/skills/tdd/
 ```
+
+Claude Code auto-discovers skills in `.claude/skills/`. Once copied,
+the skill appears in the `/` menu and Claude can invoke it
+automatically when relevant.
 
 ### 2. Create your PROJECT.md
 
 Copy the template and fill in your project's details:
 
 ```bash
-cp /tmp/tdd-skill/PROJECT.md .claude/skills/tdd-implementation/PROJECT.md
+cp /tmp/tdd-skill/PROJECT.md .claude/skills/tdd/PROJECT.md
 ```
 
 Or start from an example config:
 
 ```bash
 # Pick your stack
-cp /tmp/tdd-skill/project-configs/typescript-node.md \
-   .claude/skills/tdd-implementation/PROJECT.md
+cp /tmp/tdd-skill/project-configs/android-kotlin.md \
+   .claude/skills/tdd/PROJECT.md
 ```
 
 Edit `PROJECT.md` with your test commands, architecture rules, and conventions.
 
 ### 3. Use it
 
-In Claude Code, invoke the skill when starting work:
+Invoke the skill directly:
 
 ```
-Use tdd skill to implement the user search feature
+/tdd implement the user search feature
+/tdd fix the pagination bug
+/tdd refactor auth to use OAuth2
 ```
 
+Or let Claude invoke it automatically when you describe work that
+needs test verification:
+
 ```
-Fix the pagination bug using the TDD process
+I need to add rate limiting to the API endpoints. Research the
+codebase first, then implement with tests.
 ```
 
 ## File Structure

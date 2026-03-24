@@ -1,16 +1,51 @@
 ---
-name: tdd-implementation
-description: "Structured TDD implementation process for features and fixes. Handles analysis, planning, chunk decomposition, JSON tracker creation, pre-test/post-test cycles, and 8-point quality verification."
-metadata:
-  version: "2.0"
-  license: "Apache-2.0"
+name: tdd
+description: "Structured TDD process: explores code, plans with chunk decomposition, writes failing tests first, implements to pass, and runs an 8-point quality checklist. Use when implementing features, fixing bugs, or refactoring with test verification."
+argument-hint: "[description of feature, fix, or refactor]"
+effort: high
 ---
 
 # TDD Implementation Process
 
-Structured, repeatable process for implementing features and fixes
-with test-driven development, quality verification, and progress
-tracking.
+Implement the following using test-driven development: $ARGUMENTS
+
+Tests give Claude a self-verification loop. Instead of producing code
+that looks right, write tests first, then implement until they pass.
+This is the highest-leverage pattern for agentic coding.
+
+## Mapping to Claude Code Workflow
+
+| Claude Code Phase | TDD Phase | What Happens |
+|---|---|---|
+| **Explore** | Phase 1: Analysis | Read files, trace data flow, check standards |
+| **Plan** | Phase 2: Planning | Chunk decomposition, dependency graph, approval |
+| **Implement** | Phases 3-5: TDD Cycle | Per-chunk: failing test -> code -> passing test |
+| **Commit** | (user-initiated) | Commit when user requests |
+
+## When to Use This Process
+
+| Scope | Approach |
+|---|---|
+| Trivial (typo, rename, version bump) | Don't use this skill -- just do it directly |
+| Small (single-file logic, simple bug fix) | Small feature shortcut (skip chunking) |
+| Medium+ (multi-file, unfamiliar code) | Full process |
+| Large (cross-cutting, multi-session) | Full process + JSON tracker |
+
+**Small feature shortcut:** For single-file or few-file changes
+with no new domain logic (pure UI, config wiring), collapse to:
+Analysis -> Pre-Test (verify existing coverage) -> Implement ->
+Post-Test (regression) -> Quality Verification. Skip chunking,
+plan mode, and JSON tracker unless the user requests them.
+
+## Supporting Files
+
+Load these on demand, not all upfront:
+
+| File | When to Load |
+|---|---|
+| [chunk-template.md](references/chunk-template.md) | Phase 2, when decomposing into chunks (skip for small features) |
+| [tracker-schema.md](references/tracker-schema.md) | Phase 2.3, only for multi-session features (3+ chunks) |
+| [quality-checklist.md](references/quality-checklist.md) | Phase 2.5 (plan review) and Phase 6 (final verification) |
 
 ## Process Overview
 
@@ -25,12 +60,6 @@ Phase 6: Quality Verification
 
 Each phase must complete before the next begins.
 For multi-chunk features, Phases 3-5 repeat per chunk.
-
-**Small feature shortcut:** For single-file or few-file changes
-with no new domain logic (pure UI, config wiring), collapse to:
-Analysis -> Pre-Test (verify existing coverage) -> Implement ->
-Post-Test (regression) -> Quality Verification. Skip chunking,
-plan mode, and JSON tracker unless the user requests them.
 
 ---
 
@@ -48,6 +77,10 @@ plan mode, and JSON tracker unless the user requests them.
 - Trace the data flow through the application layers
 - Identify existing patterns, utilities, abstractions to reuse
 - Check for existing test coverage in the affected area
+
+**Context tip:** For broad exploration across unfamiliar code, use
+subagents to investigate. They run in a separate context and report
+back summaries, keeping your main context clean for implementation.
 
 ### 1.3 Check Industry Standards
 
@@ -120,7 +153,7 @@ The small feature shortcut always skips the tracker.
 
 ### 2.4 Present Plan to User
 
-Enter plan mode (unless user directed otherwise) and present:
+Enter Plan Mode (`Shift+Tab` twice from Normal Mode) and present:
 
 - Context: why this change is needed
 - Acceptance criteria
@@ -128,7 +161,11 @@ Enter plan mode (unless user directed otherwise) and present:
 - Files affected
 - Quality verification approach
 
-Get user approval before proceeding.
+Press `Ctrl+G` to open the plan in your text editor for direct
+editing before proceeding.
+
+Get user approval, then switch back to Normal Mode (`Shift+Tab`)
+before proceeding to implementation.
 
 ### 2.5 Plan Review (8-Point Checklist on the Plan)
 
@@ -254,6 +291,15 @@ Run the project's build command. Compilation must succeed.
 Set chunk status to `complete` in the JSON tracker (if using
 tracker) or mark the task completed in the task list.
 
+### 5.5 Manage Context (Multi-Chunk Only)
+
+If context is growing large after several chunks:
+
+- Run `/compact Focus on the remaining chunks and test results`
+- For very long features spanning sessions, use `/rename` to
+  name the session and `--resume` to continue later
+- The JSON tracker ensures no progress is lost across sessions
+
 ---
 
 ## Phase 6: Quality Verification
@@ -272,6 +318,10 @@ for detailed criteria.
 6. **Robustness** - Error handling, empty states, edge cases
 7. **Gaps (Architectural)** - Abstraction boundaries respected
 8. **Blindspots** - Concurrency, security, edge environments
+
+Optionally run `/simplify` after the checklist to get a parallel
+subagent review of changed files for code reuse, quality, and
+efficiency issues.
 
 ### Post-Implementation Documentation
 
@@ -377,3 +427,6 @@ When resuming work on an in-progress feature:
 4. Read the chunk's `resume` field for instructions
 5. Follow TDD workflow (Phase 3 -> 4 -> 5)
 6. Update tracker status
+
+**Tip:** Use `--resume` to continue a named session, or read the
+JSON tracker if starting a fresh session on an existing feature.

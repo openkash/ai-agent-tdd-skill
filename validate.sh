@@ -295,6 +295,62 @@ for config in project-configs/*.md; do
 done
 
 # ─────────────────────────────────────────────
+section "11. SKILL.md frontmatter follows skills spec"
+# ─────────────────────────────────────────────
+
+# Check required/recommended frontmatter fields
+if grep -qP '^name:' SKILL.md; then
+    skill_name="$(grep -oP '^name:\s*\K\S+' SKILL.md)"
+    pass "Has 'name' field: $skill_name"
+    # Validate name format: lowercase, numbers, hyphens only
+    if echo "$skill_name" | grep -qP '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'; then
+        pass "Name format is valid (lowercase, hyphens)"
+    else
+        fail "Name '$skill_name' should be lowercase letters, numbers, and hyphens only"
+    fi
+else
+    fail "SKILL.md missing 'name' field"
+fi
+
+if grep -qP '^description:' SKILL.md; then
+    pass "Has 'description' field"
+else
+    fail "SKILL.md missing 'description' field"
+fi
+
+# Check for $ARGUMENTS usage (skill receives user input)
+if grep -q '\$ARGUMENTS' SKILL.md; then
+    pass "SKILL.md uses \$ARGUMENTS placeholder"
+else
+    fail "SKILL.md missing \$ARGUMENTS (user input won't reach the process)"
+fi
+
+# Check for non-standard frontmatter fields
+# Extract frontmatter (between first and second ---)
+frontmatter="$(sed -n '2,/^---$/p' SKILL.md | head -n -1)"
+known_fields="name|description|argument-hint|disable-model-invocation|user-invocable|allowed-tools|model|effort|context|agent|hooks"
+unknown_fields="$(echo "$frontmatter" | grep -oP '^\K[a-z][a-z_-]*(?=:)' | grep -vP "^($known_fields)$" || true)"
+if [[ -z "$unknown_fields" ]]; then
+    pass "No non-standard frontmatter fields"
+else
+    while IFS= read -r field; do
+        [[ -z "$field" ]] && continue
+        fail "Non-standard frontmatter field: '$field'"
+    done <<< "$unknown_fields"
+fi
+
+# ─────────────────────────────────────────────
+section "12. SKILL.md is under 500 lines"
+# ─────────────────────────────────────────────
+
+skill_lines="$(wc -l < SKILL.md)"
+if [[ "$skill_lines" -le 500 ]]; then
+    pass "SKILL.md is $skill_lines lines (limit: 500)"
+else
+    fail "SKILL.md is $skill_lines lines (recommended limit: 500)"
+fi
+
+# ─────────────────────────────────────────────
 # Summary
 # ─────────────────────────────────────────────
 printf "\n\033[1m━━━ Results ━━━\033[0m\n"
