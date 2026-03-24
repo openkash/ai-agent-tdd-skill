@@ -10,9 +10,14 @@ Each point should be verified with specific evidence
 
 Verify every acceptance criterion is met.
 
+**Self-evaluation warning:** This is where generators most often
+over-report. Cross-check each criterion against the tracker's
+`acceptance_criteria` array — don't rely on memory of what was
+planned. If using a subagent evaluator, have it verify independently.
+
 **How to check:**
 
-- List all acceptance criteria from the plan
+- List all acceptance criteria from the tracker (not from memory)
 - For each criterion, identify the code that implements it
 - For each criterion, identify the test that verifies it
 - Mark any criteria that rely on manual testing (UI changes)
@@ -55,6 +60,10 @@ Verify data mapping, conversions, and logic are correct.
 ## 3. Gaps (Functional)
 
 Verify no broken references, missing wiring, or orphaned code.
+
+**Self-evaluation warning:** Generators tend to miss gaps in files
+they didn't directly modify. Always grep — don't rely on recall of
+which files reference the changed code.
 
 **How to check:**
 
@@ -164,6 +173,11 @@ grep -r "import.*db\." src/controllers/ --include="*.ext"
 ## 8. Blindspots
 
 Verify edge cases that automated tests may miss.
+
+**Self-evaluation warning:** This is the hardest point to
+self-assess honestly. Generators naturally focus on what they
+built, not what they missed. For medium+ features, delegate
+this check to a subagent evaluator via `/simplify`.
 
 **Always check:**
 

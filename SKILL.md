@@ -27,15 +27,16 @@ This is the highest-leverage pattern for agentic coding.
 | Scope | Approach |
 |---|---|
 | Trivial (typo, rename, version bump) | Don't use this skill -- just do it directly |
-| Small (single-file logic, simple bug fix) | Small feature shortcut (skip chunking) |
+| Small (single-file logic, simple bug fix) | Small feature shortcut (1-chunk tracker) |
 | Medium+ (multi-file, unfamiliar code) | Full process |
-| Large (cross-cutting, multi-session) | Full process + JSON tracker |
+| Large (cross-cutting, multi-session) | Full process + session resets between chunks |
 
 **Small feature shortcut:** For single-file or few-file changes
 with no new domain logic (pure UI, config wiring), collapse to:
 Analysis -> Pre-Test (verify existing coverage) -> Implement ->
-Post-Test (regression) -> Quality Verification. Skip chunking,
-plan mode, and JSON tracker unless the user requests them.
+Post-Test (regression) -> Quality Verification. Use a 1-chunk
+tracker (see [tracker-schema.md](references/tracker-schema.md)
+§Single-Chunk Features). Skip chunking and plan mode.
 
 ## Supporting Files
 
@@ -44,7 +45,7 @@ Load these on demand, not all upfront:
 | File | When to Load |
 |---|---|
 | [chunk-template.md](references/chunk-template.md) | Phase 2, when decomposing into chunks (skip for small features) |
-| [tracker-schema.md](references/tracker-schema.md) | Phase 2.3, only for multi-session features (3+ chunks) |
+| [tracker-schema.md](references/tracker-schema.md) | Phase 2.3, when creating the tracker (all features) |
 | [quality-checklist.md](references/quality-checklist.md) | Phase 2.5 (plan review) and Phase 6 (final verification) |
 
 ## Process Overview
@@ -138,18 +139,21 @@ Layer 2 (deps on L1):  Chunks needing Layer 1 complete
 Layer N (final):       Regression + quality verification
 ```
 
-### 2.3 Create JSON Tracker (Multi-Session Only)
+### 2.3 Create JSON Tracker
 
-For multi-session features (3+ chunks, likely to span sessions),
-create a tracker file following the schema in
+Create a tracker file following the schema in
 [tracker-schema.md](references/tracker-schema.md).
+The tracker is always created, even for single-chunk features
+(see §Single-Chunk Features in the schema).
 
 The tracker is the single source of truth for progress.
 Always update status to `in_progress` BEFORE starting a chunk.
 
-**Skip the tracker** for single-session features where the AI
-assistant's task list and git history provide sufficient tracking.
-The small feature shortcut always skips the tracker.
+**Why always?** The tracker is a file-based artifact that survives
+context resets. Relying on in-context memory loses state when
+sessions end or context is compacted. The tracker ensures any
+session — current or future — can pick up exactly where work
+stopped.
 
 ### 2.4 Present Plan to User
 
@@ -231,8 +235,7 @@ reason (compile error or assertion failure, not infrastructure).
 
 ### 4.1 Update Tracker
 
-Set chunk status to `in_progress` in the JSON tracker (if using
-tracker) or mark the task in_progress in the task list.
+Set chunk status to `in_progress` in the JSON tracker.
 
 ### 4.2 Implement Production Code
 
@@ -288,17 +291,21 @@ Run the project's build command. Compilation must succeed.
 
 ### 5.4 Update Tracker
 
-Set chunk status to `complete` in the JSON tracker (if using
-tracker) or mark the task completed in the task list.
+Set chunk status to `complete` in the JSON tracker.
 
-### 5.5 Manage Context (Multi-Chunk Only)
+### 5.5 Manage Context
 
-If context is growing large after several chunks:
+Prefer **context resets** over compaction. A clean session with
+the tracker as handoff preserves more fidelity than compacted
+context, which loses information unpredictably.
 
-- Run `/compact Focus on the remaining chunks and test results`
-- For very long features spanning sessions, use `/rename` to
-  name the session and `--resume` to continue later
-- The JSON tracker ensures no progress is lost across sessions
+**Between chunks (preferred):** Start a new session. The JSON
+tracker + resume fields give the new session everything it needs.
+Use `/rename` to name the session for reference.
+
+**Mid-chunk (fallback only):** If you must compact within a chunk,
+run `/compact Focus on the current chunk, tracker path, and test
+results`. This is a fallback — finish the chunk and reset.
 
 ---
 
@@ -319,9 +326,12 @@ for detailed criteria.
 7. **Gaps (Architectural)** - Abstraction boundaries respected
 8. **Blindspots** - Concurrency, security, edge environments
 
-Optionally run `/simplify` after the checklist to get a parallel
-subagent review of changed files for code reuse, quality, and
-efficiency issues.
+**Use a subagent for verification (medium+ features).** Agents
+tend to praise their own work — separating generation from
+evaluation produces more honest assessment. Run `/simplify` to
+get a parallel subagent review of changed files for code reuse,
+quality, and efficiency. For small features, self-verification
+against the checklist is sufficient.
 
 ### Post-Implementation Documentation
 
@@ -406,6 +416,13 @@ what was reviewed, what was fixed, and what was intentionally left.
     reproduction, user-provided test case), Phase 3 collapses
     to "verify tests still fail for the right reason." Don't
     rewrite or duplicate them - go straight to Phase 4
+17. **Stress-test your process scaffolding** -
+    Every process step encodes assumptions about model
+    limitations. As models improve, re-evaluate whether
+    scaffolding (sprint decomposition, heavy chunking,
+    frequent resets) is still needed. Remove what no longer
+    helps — simpler processes with fewer handoffs are faster
+    and lose less context
 
 ---
 

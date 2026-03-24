@@ -21,6 +21,7 @@ It is a local working file - not committed to version control.
       "files_create": ["path/to/NewFile.ext"],
       "files_modify": ["path/to/ExistingFile.ext"],
       "test_files": ["path/to/TestFile.ext"],
+      "acceptance_criteria": ["Criterion 1", "Criterion 2"],
       "tdd": "Write test for X. Run -> fail -> implement -> pass.",
       "depends_on": [],
       "resume": "Compact implementation instructions for session resumption.",
@@ -65,6 +66,7 @@ It is a local working file - not committed to version control.
 | `files_create` | Yes | Paths of new files to create (empty array if none) |
 | `files_modify` | Yes | Paths of existing files to modify (empty array if none) |
 | `test_files` | Yes | Paths of test files (new or modified) |
+| `acceptance_criteria` | Yes | Array of testable pass/fail conditions for this chunk |
 | `tdd` | Yes | TDD instructions: what to test, expected fail, then pass |
 | `depends_on` | Yes | Array of chunk IDs that must be `complete` first |
 | `resume` | Yes | Compact instructions for resuming this chunk |
@@ -145,6 +147,7 @@ For small features (1 chunk), the tracker is still created but simplified:
       "files_create": [],
       "files_modify": ["path/to/File.ext"],
       "test_files": ["path/to/Test.ext"],
+      "acceptance_criteria": ["Describe the pass/fail condition"],
       "tdd": "Pre-test: existing TestClass covers logic. Pure UI change. Post-test: full suite regression.",
       "depends_on": [],
       "notes": "Optional context."

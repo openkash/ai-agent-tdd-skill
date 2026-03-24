@@ -71,8 +71,18 @@ If changing file A requires changing file B to compile:
 Data layer (no deps) -> Domain layer -> UI layer -> Verification
 ```
 
-### Step 5: Write Resume Instructions
-For each chunk, write compact instructions that include:
+### Step 5: Write Acceptance Criteria and Resume Instructions
+
+For each chunk, define **acceptance criteria** — explicit pass/fail
+conditions that determine whether the chunk is done. These are the
+"sprint contract" agreed before implementation begins.
+
+Good acceptance criteria are:
+- **Testable** — each criterion maps to a test assertion or verifiable output
+- **Specific** — "search returns filtered results" not "search works"
+- **Complete** — cover happy path, edge cases, and error cases
+
+Then write compact resume instructions that include:
 - FILES to create/modify
 - WHAT the change does
 - PATTERN to follow (existing code reference)
@@ -88,6 +98,12 @@ For each chunk, write compact instructions that include:
 {
   "id": 1,
   "name": "buildShareText and toDuplicate helpers",
+  "acceptance_criteria": [
+    "buildShareText returns formatted string with title and date",
+    "buildShareText includes location when present, omits when empty",
+    "toDuplicate copies all fields except generates new ID",
+    "toDuplicate preserves timed format with start/end times"
+  ],
   "files_create": [],
   "files_modify": ["src/domain/model/Item.ts"],
   "test_files": ["src/domain/model/Item.test.ts"],
@@ -101,6 +117,10 @@ For each chunk, write compact instructions that include:
 {
   "id": 2,
   "name": "Share button in QuickView",
+  "acceptance_criteria": [
+    "Share button renders in QuickView detail panel",
+    "Button click triggers onShare callback with current item"
+  ],
   "files_create": [],
   "files_modify": ["src/ui/components/QuickView.tsx"],
   "test_files": [],
@@ -114,6 +134,10 @@ For each chunk, write compact instructions that include:
 {
   "id": 3,
   "name": "App-level callback wiring",
+  "acceptance_criteria": [
+    "Share callback connected from App to QuickView",
+    "Share action calls buildShareText and opens share dialog"
+  ],
   "files_create": [],
   "files_modify": ["src/App.tsx"],
   "test_files": [],
@@ -127,6 +151,11 @@ For each chunk, write compact instructions that include:
 {
   "id": 4,
   "name": "Full Regression + Quality Verification",
+  "acceptance_criteria": [
+    "Full test suite passes with no new failures",
+    "Build compiles without errors or new warnings",
+    "8-point quality checklist completed"
+  ],
   "files_create": [],
   "files_modify": [],
   "test_files": [],
