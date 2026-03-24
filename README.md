@@ -1,3 +1,6 @@
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blueviolet.svg)](https://claude.com/claude-code)
+
 # TDD Skill for Claude Code
 
 A structured, project-agnostic Test-Driven Development process for
