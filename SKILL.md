@@ -70,6 +70,10 @@ For multi-chunk features, Phases 3-5 repeat per chunk.
 
 - Read the user's request carefully
 - Identify: new feature, enhancement, bug fix, refactor, or test
+- Check `docs/specs/` for an existing spec file matching the feature.
+  If found, use it as primary input — user stories, acceptance criteria,
+  and edge cases become the basis for chunk decomposition in Phase 2.
+  (Specs are created by the [spec skill](https://github.com/openkash/ai-agent-spec-skill), an optional companion.)
 - Ask clarifying questions if the scope is ambiguous
 
 ### 1.2 Explore Current Code
