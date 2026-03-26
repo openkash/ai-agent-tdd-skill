@@ -181,8 +181,15 @@ before proceeding to implementation.
 8-point quality checklist. This catches design bugs before they
 become code bugs.
 
-Apply the [quality-checklist.md](references/quality-checklist.md)
-criteria to the **plan itself**, not the code:
+**Use the `review-plan` agent** (`.claude/agents/review-plan.md`)
+to get an independent review. Spawn it as a subagent so the
+reviewer operates in a fresh context without author bias:
+
+```
+Use the review-plan agent to review [path to tracker/plan]
+```
+
+The agent evaluates these 8 criteria against the plan:
 
 1. **Completeness** - Does every acceptance criterion have a chunk?
 2. **Correctness** - Are catch scopes right? Are edge cases handled?
@@ -195,8 +202,9 @@ criteria to the **plan itself**, not the code:
 7. **Gaps (Architectural)** - Are abstraction boundaries respected?
 8. **Blindspots** - Concurrency? Error propagation? Thread safety?
 
-**If issues are found:** Update the plan before proceeding. This is
-cheaper than fixing bugs in implementation.
+**If the agent reports FAIL findings:** Update the plan before
+proceeding. This is cheaper than fixing bugs in implementation.
+WARN findings can proceed with a note.
 
 ---
 
@@ -330,12 +338,21 @@ for detailed criteria.
 7. **Gaps (Architectural)** - Abstraction boundaries respected
 8. **Blindspots** - Concurrency, security, edge environments
 
-**Use a subagent for verification (medium+ features).** Agents
-tend to praise their own work — separating generation from
-evaluation produces more honest assessment. Run `/simplify` to
-get a parallel subagent review of changed files for code reuse,
-quality, and efficiency. For small features, self-verification
-against the checklist is sufficient.
+**Use the `review-impl` agent for verification (medium+ features).**
+Agents tend to praise their own work — separating generation from
+evaluation produces more honest assessment. Spawn it as a subagent:
+
+```
+Use the review-impl agent to review implementation against [path to tracker/plan]
+```
+
+The agent verifies plan conformance, acceptance criteria, test
+quality, code quality, regression, robustness, dead code, and
+documentation — then produces a structured verdict.
+
+Additionally, run `/simplify` for a parallel review of changed
+files for code reuse, quality, and efficiency. For small features,
+self-verification against the checklist is sufficient.
 
 ### Post-Implementation Documentation
 
