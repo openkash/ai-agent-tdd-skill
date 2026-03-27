@@ -91,6 +91,10 @@ back summaries, keeping your main context clean for implementation.
 
 - Research platform-specific handling and conventions
 - Check official documentation for frameworks in use
+- Check changelogs and migration guides for your dependency
+  versions — APIs may behave differently across major/minor
+  releases (e.g., a method that re-runs in v1.0 may only
+  recompose in v1.1)
 - Identify relevant specs (RFCs, W3C, language specs)
 - Note platform-specific quirks and edge cases
 
@@ -200,7 +204,7 @@ The agent evaluates these 8 criteria against the plan:
    (Grep for constructor/function usage to find unlisted breakage)
 6. **Robustness** - What if all items fail? What if input is empty?
 7. **Gaps (Architectural)** - Are abstraction boundaries respected?
-8. **Blindspots** - Concurrency? Error propagation? Thread safety?
+8. **TDD Quality** - Test files listed? BATCH annotated? Dependencies correct?
 
 **If the agent reports FAIL findings:** Update the plan before
 proceeding. This is cheaper than fixing bugs in implementation.
@@ -451,6 +455,15 @@ what was reviewed, what was fixed, and what was intentionally left.
     acceptance criteria for next time. This QA tuning loop
     — read evaluator output, find divergences from human
     expectations, refine criteria — compounds over sessions
+19. **Check dependency version changelogs during analysis** -
+    APIs can change behavior across minor versions without
+    changing their signature. A method that fully re-executes
+    in v1.0 may only recompose a subset in v1.1. During
+    Phase 1.3, check the changelog/migration guide for each
+    major dependency at your pinned version. This is
+    especially important for framework-level dependencies
+    (UI toolkits, DI containers, async runtimes) where
+    lifecycle semantics evolve between releases
 
 ---
 
