@@ -1,6 +1,16 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blueviolet.svg)](https://claude.com/claude-code)
 
+> [!IMPORTANT]
+> **This repo is deprecated.** The TDD skill is now maintained in the combined workflow repo:
+> **[openkash/ai-agent-dev-workflow](https://github.com/openkash/ai-agent-dev-workflow)**
+>
+> The combined repo includes the TDD skill, spec skill, and two independent review agents
+> (review-plan + review-impl) that form an artifact-triggered gate system. The TDD skill
+> depends on these agents for its plan review and implementation review gates.
+>
+> This repo will no longer receive updates.
+
 # TDD Skill for Claude Code
 
 A structured, project-agnostic Test-Driven Development process for
